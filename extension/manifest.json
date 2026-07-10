@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Wellfound Apply Assistant",
+  "version": "0.1.0",
+  "description": "Reads the Wellfound job you're viewing and drafts answers to the Apply questions.",
+  "permissions": ["sidePanel", "storage", "activeTab", "scripting"],
+  "host_permissions": ["https://wellfound.com/*"],
+  "background": {
+    "service_worker": "src/background/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://wellfound.com/*"],
+      "js": ["src/content/content.ts"],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "src/panel/index.html"
+  },
+  "action": {
+    "default_title": "Wellfound Apply Assistant"
+  }
+}

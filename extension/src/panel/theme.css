@@ -1,0 +1,36 @@
+/* Claude-styled palette (approximate — tune later). Light + dark. */
+:root {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --border: #e8e6dd;
+  --text: #1f1e1d;
+  --muted: #6e6e68;
+  --accent: #d97757;
+  --accent-hover: #bd5d42;
+
+  --font-ui: Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #262624;
+    --surface: #30302e;
+    --border: #3e3e3b;
+    --text: #eceae0;
+    --muted: #a3a299;
+    --accent: #d97757;
+    --accent-hover: #bd5d42;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+}

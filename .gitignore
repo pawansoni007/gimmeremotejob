@@ -1,0 +1,23 @@
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.uv/
+.ruff_cache/
+
+# Node / extension build
+node_modules/
+dist/
+*.log
+
+# Env / secrets
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# Vendored OpenHarness build artifacts (we commit the source, not its caches)
+third_party/OpenHarness/**/__pycache__/
+third_party/OpenHarness/**/*.pyc
+third_party/OpenHarness/.venv/
