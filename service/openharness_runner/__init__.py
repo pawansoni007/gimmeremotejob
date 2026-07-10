@@ -1,9 +1,25 @@
 """Builds and drives OpenHarness's QueryEngine, forwarding its StreamEvents.
 
-Wired up in Step 4–5. Intended shape:
+Usage (Step 5 wires this behind FastAPI + SSE):
 
-    from openharness...  import QueryEngine   # exact bootstrap TBD in Step 4
+    from openharness_runner import JobPayload, draft_answers, event_to_dict
 
-    def build_query_engine(cwd): ...          # Ollama-backed, default tools/prompt
-    async def run(job, questions): ...        # yields StreamEvents for SSE
+    async for event in draft_answers(job):
+        sse.send(event_to_dict(event))
 """
+
+from .models import CompanyPayload, JobPayload, QuestionPayload
+from .prompts import SYSTEM_PROMPT, build_prompt
+from .runner import build_query_engine, draft_answers, event_to_dict, load_profile
+
+__all__ = [
+    "CompanyPayload",
+    "JobPayload",
+    "QuestionPayload",
+    "SYSTEM_PROMPT",
+    "build_prompt",
+    "build_query_engine",
+    "draft_answers",
+    "event_to_dict",
+    "load_profile",
+]

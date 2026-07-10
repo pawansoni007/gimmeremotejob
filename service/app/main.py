@@ -3,6 +3,7 @@
 Step 1: only a health check + CORS so the extension can reach us. The streaming
 apply endpoint (Step 5) and persistence (Step 6) are stubbed below.
 """
+
 from __future__ import annotations
 
 from fastapi import FastAPI

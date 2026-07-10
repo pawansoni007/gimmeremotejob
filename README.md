@@ -21,11 +21,14 @@ Plus `docker-compose.yml` for Postgres.
 
 ## Status
 
-Built in small steps. **Steps 1–3 are in place**: open a Wellfound job and the
+Built in small steps. **Steps 1–4 are in place**: open a Wellfound job and the
 side panel shows everything the extension read — the Apply form's written
 questions up top (with anything you already typed), then title, company, salary,
 remote-work fields, skills, full description (plus any emails in the JD, saved
-for the later outreach feature). See each folder's README for details.
+for the later outreach feature). On the service side, OpenHarness's
+`QueryEngine` runs in-process against local Ollama and streams drafted answers
+(`uv run python -m openharness_runner.smoke` to see it live). See each folder's
+README for details.
 
 ## Toolchain (locked)
 
@@ -44,7 +47,7 @@ available (signed in for the cloud model), Chrome (load the extension unpacked).
 1. ✅ Skeleton
 2. ✅ Extension reads a Wellfound job into the side panel
 3. ✅ Extension grabs the Apply questions
-4. Wire up OpenHarness in-process (Ollama-backed)
+4. ✅ Wire up OpenHarness in-process (Ollama-backed)
 5. FastAPI + SSE streaming into the panel
 6. Postgres memory (save + resume conversations)
 7. Polish

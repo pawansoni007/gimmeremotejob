@@ -24,3 +24,6 @@ third_party/OpenHarness/.venv/
 
 # extension DOM-test bundle
 extension/dist-test/
+
+# personal candidate profile (grounds the drafted answers)
+service/profile.md
