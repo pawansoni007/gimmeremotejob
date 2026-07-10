@@ -9,18 +9,40 @@ Vite + `@crxjs/vite-plugin`.
 npm install
 npm run dev        # Vite dev build into dist/
 npm run typecheck  # tsgo --noEmit  (TypeScript 7.0 native)
+npm run test:dom   # extraction test against a saved real job modal (headless Chrome)
 ```
 
 Then load it in Chrome: `chrome://extensions` → enable **Developer mode** →
 **Load unpacked** → select the `dist/` folder.
 
+`test:dom` launches your installed Chrome via `playwright-core`; set
+`CHROMIUM_PATH=/path/to/chromium` if it can't find one.
+
 ## Layout
 
-- `src/content/` — content script + the **stable Wellfound selectors**
-  (`selectors.ts`). We anchor on `data-test` / `id` / `name` / `href`, never the
-  hashed `styles_*` classes. Reading the job (Step 2) and questions (Step 3) go here.
-- `src/panel/` — the side-panel UI (Claude-styled). Streams the agent log +
-  suggested answers (Step 5).
-- `src/background/` — service worker; opens the side panel.
+- `src/content/` — content script. `selectors.ts` holds the **stable Wellfound
+  anchors** (`data-test` / `id` / `name` / `href` — never the hashed `styles_*`
+  classes), `extract.ts` turns the open job modal into a `JobInfo`, and
+  `content.ts` watches the SPA for the modal appearing/changing/closing
+  (debounced MutationObserver + diff, since the modal's content streams in
+  after it mounts).
+- `src/shared/` — the `JobInfo` type + messages shared by all three contexts.
+- `src/background/` — service worker; opens the side panel and relays job data
+  from the content script into `chrome.storage.session`.
+- `src/panel/` — the side-panel UI (Claude-styled). Shows the current job now;
+  questions + streamed answers land in Steps 3–5.
+- `test/` — DOM test running `extract.ts` against `fixtures/job-modal.html`
+  (a saved copy of a real job modal) in headless Chromium.
 
-> Step 1 = skeleton. Content script currently just detects the job modal and logs.
+## How the data flows (Step 2)
+
+```
+wellfound.com DOM ──content script──► chrome.runtime message
+        ──background──► chrome.storage.session ──onChanged──► side panel
+```
+
+Storage (not direct messaging) is the bus so the panel shows the job even when
+it's opened *after* the job was captured.
+
+> Steps 1–2 done: the panel shows the job you're viewing (title, company, salary,
+> remote policy & friends, skills, description). Next: the Apply questions.

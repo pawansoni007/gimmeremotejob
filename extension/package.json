@@ -6,16 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsgo --noEmit",
+    "test:dom": "vite build --config test/vite.lib.config.ts && node test/extract.dom.test.mjs"
   },
   "dependencies": {
-    "core-js": "^3.38.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-scroll-area": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
-    "@radix-ui/react-tooltip": "^1.1.2"
+    "@radix-ui/react-tooltip": "^1.1.2",
+    "core-js": "^3.38.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.26",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^18.3.0",
     "@typescript/native-preview": "latest",
     "@vitejs/plugin-react": "^4.3.1",
+    "playwright-core": "^1.61.1",
     "vite": "^5.4.0"
   }
 }

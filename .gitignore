@@ -21,3 +21,6 @@ dist/
 third_party/OpenHarness/**/__pycache__/
 third_party/OpenHarness/**/*.pyc
 third_party/OpenHarness/.venv/
+
+# extension DOM-test bundle
+extension/dist-test/

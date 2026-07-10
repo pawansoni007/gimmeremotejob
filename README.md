@@ -21,8 +21,10 @@ Plus `docker-compose.yml` for Postgres.
 
 ## Status
 
-Built in small steps. **Step 1 (skeleton)** is in place: folder layout, config
-files, and stubs. Nothing is wired up yet — see each folder's README/TODOs.
+Built in small steps. **Steps 1–2 are in place**: open a Wellfound job and the
+side panel shows everything the extension read — title, company, salary,
+remote-work fields, skills, full description (plus any emails in the JD, saved
+for the later outreach feature). See each folder's README for details.
 
 ## Toolchain (locked)
 
@@ -39,7 +41,7 @@ available (signed in for the cloud model), Chrome (load the extension unpacked).
 ## Quick map of upcoming steps
 
 1. ✅ Skeleton
-2. Extension reads a Wellfound job into the side panel
+2. ✅ Extension reads a Wellfound job into the side panel
 3. Extension grabs the Apply questions
 4. Wire up OpenHarness in-process (Ollama-backed)
 5. FastAPI + SSE streaming into the panel

@@ -1,13 +1,26 @@
-// Step 1 skeleton panel. The job view, agent log, and suggested answers land here
-// in Steps 2–5.
+import { JobCard } from "./JobCard";
+import { useCurrentJob } from "./useCurrentJob";
+
 export function App() {
+  const job = useCurrentJob();
+
   return (
-    <main style={{ padding: 20, maxWidth: 420, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 18, marginBottom: 8 }}>Apply Assistant</h1>
-      <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.5 }}>
-        Skeleton in place. Open a Wellfound job and the panel will read it here
-        (coming in Step 2).
-      </p>
+    <main className="panel">
+      <header className="panel-header">
+        <h1>Apply Assistant</h1>
+      </header>
+
+      {job ? (
+        <JobCard job={job} />
+      ) : (
+        <div className="empty-state">
+          <p>No job in view.</p>
+          <p className="hint">
+            Open a job on wellfound.com and it will show up here — questions and
+            drafted answers land in the next steps.
+          </p>
+        </div>
+      )}
     </main>
   );
 }
