@@ -9,6 +9,7 @@ Vite + `@crxjs/vite-plugin`.
 npm install
 npm run dev        # Vite dev build into dist/
 npm run typecheck  # tsgo --noEmit  (TypeScript 7.0 native)
+npm run test:unit  # pure-logic tests (SSE decoding, answer splitting) in Node
 npm run test:dom   # extraction test against a saved real job modal (headless Chrome)
 ```
 
@@ -44,8 +45,9 @@ wellfound.com DOM ──content script──► chrome.runtime message
 Storage (not direct messaging) is the bus so the panel shows the job even when
 it's opened *after* the job was captured.
 
-> Steps 1–3 done: the panel shows the job you're viewing (title, company, salary,
-> remote policy & friends, skills, description) and the Apply form's written
-> questions — each `customQuestionAnswers[<id>][answer]` field paired with its
-> label text (read by walking up from the field: Wellfound's label `for`
-> attributes are broken). Next: wiring up OpenHarness to draft the answers.
+> Steps 1–5 done: the panel shows the job and its Apply questions, and **Draft
+> answers** streams the model's draft live from the local service
+> (`POST /apply/stream`, SSE over fetch — EventSource can't POST), then splits
+> it into per-question answers with Copy buttons. The service must be running
+> (`cd service && uv run uvicorn app.main:app --port 8756`); the panel says so
+> if it isn't.

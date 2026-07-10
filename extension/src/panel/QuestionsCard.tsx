@@ -1,9 +1,12 @@
 import type { JobInfo } from "../shared/types";
+import { CopyButton } from "./CopyButton";
+import { useDraft } from "./useDraft";
 
-// The Apply form's written questions. Each question gets an answer slot that
-// the agent fills in Step 5 — for now we show the question, its length hint,
-// and anything the user already typed in the real form.
+// The Apply form's written questions, and the drafting flow: hit "Draft
+// answers", watch the agent stream, then copy each answer into the real form.
 export function QuestionsCard({ job }: { job: JobInfo }) {
+  const { state, start, stop } = useDraft(job);
+
   if (!job.hasApplyForm) {
     return (
       <section className="questions-card">
@@ -27,31 +30,89 @@ export function QuestionsCard({ job }: { job: JobInfo }) {
     );
   }
 
+  const streaming = state.status === "streaming";
+
   return (
     <section className="questions-card">
-      <h2 className="card-heading">
-        Apply questions
-        <span className="count-badge">{job.questions.length}</span>
-      </h2>
+      <div className="card-heading-row">
+        <h2 className="card-heading">
+          Apply questions
+          <span className="count-badge">{job.questions.length}</span>
+        </h2>
+        {streaming ? (
+          <button className="stop-button" onClick={stop}>
+            Stop
+          </button>
+        ) : (
+          <button className="draft-button" onClick={start}>
+            {state.status === "done" || state.status === "error" ? "Redraft" : "Draft answers"}
+          </button>
+        )}
+      </div>
+
+      {streaming && (
+        <div className="agent-log">
+          {state.liveText ? (
+            <p className="agent-text streaming">{state.liveText}</p>
+          ) : (
+            <p className="agent-thinking">Thinking…</p>
+          )}
+        </div>
+      )}
+
+      {state.status === "error" && (
+        <div className="error-note">
+          {state.error}
+          {state.liveText && (
+            <details className="error-partial">
+              <summary>Partial output</summary>
+              <p className="agent-text">{state.liveText}</p>
+            </details>
+          )}
+        </div>
+      )}
+
       <ol className="question-list">
-        {job.questions.map((q, i) => (
-          <li className="question-item" key={q.id}>
-            <div className="question-top">
-              <span className="q-num">Q{i + 1}</span>
-              <span className="q-kind">
-                {q.kind === "textarea" ? "long answer" : "short answer"}
-              </span>
-            </div>
-            <p className="q-text">{q.question}</p>
-            {q.currentValue && (
-              <p className="q-draft">
-                <span className="q-draft-label">Already typed:</span> {q.currentValue}
-              </p>
-            )}
-          </li>
-        ))}
+        {job.questions.map((q, i) => {
+          const answer = state.answers?.[i];
+          return (
+            <li className="question-item" key={q.id}>
+              <div className="question-top">
+                <span className="q-num">Q{i + 1}</span>
+                <span className="q-kind">
+                  {q.kind === "textarea" ? "long answer" : "short answer"}
+                </span>
+              </div>
+              <p className="q-text">{q.question}</p>
+              {q.currentValue && !answer && (
+                <p className="q-draft">
+                  <span className="q-draft-label">Already typed:</span> {q.currentValue}
+                </p>
+              )}
+              {answer !== undefined && (
+                <div className="answer-block">
+                  {answer ? (
+                    <>
+                      <p className="answer-text">{answer}</p>
+                      <div className="answer-actions">
+                        <CopyButton text={answer} />
+                      </div>
+                    </>
+                  ) : (
+                    <p className="card-note">No answer drafted for this one — hit Redraft.</p>
+                  )}
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ol>
-      <p className="card-note">Drafted answers land here in Step 5.</p>
+
+      {state.status === "idle" && (
+        <p className="card-note">
+          Drafts stream from your local model — review, tweak, then copy into the form.
+        </p>
+      )}
     </section>
   );
 }

@@ -239,6 +239,155 @@ body {
   color: var(--accent);
 }
 
+/* ---- Buttons & streaming (Step 5) ---- */
+
+.card-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.draft-button {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.draft-button:hover {
+  background: var(--accent-hover);
+}
+
+.stop-button {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.stop-button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.agent-log {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  padding: 10px 12px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.agent-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.agent-text.streaming::after {
+  content: "▍";
+  color: var(--accent);
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.agent-thinking {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  animation: thinking-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.error-note {
+  margin-top: 12px;
+  border: 1px solid color-mix(in srgb, #c0392b 40%, var(--border));
+  background: color-mix(in srgb, #c0392b 8%, var(--surface));
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.error-partial summary {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.answer-block {
+  margin-top: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+  animation: card-in 0.25s ease-out;
+}
+
+.answer-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.answer-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.copy-button {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.copy-button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.copy-button.copied {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* ---- Questions card ---- */
 
 .questions-card {

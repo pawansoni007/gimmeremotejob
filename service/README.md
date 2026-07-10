@@ -5,7 +5,9 @@ backed) and mirrors conversations into Postgres. Managed with **uv**.
 
 ## Layout
 
-- `app/` — FastAPI app, config, and (Step 5) the SSE endpoint.
+- `app/` — FastAPI app + config. `POST /apply/stream` takes the extension's
+  `JobInfo` JSON and streams the drafting run back as SSE (each event's `data`
+  is one JSON object; the stream ends with `{"type": "done"}`).
 - `openharness_runner/` — builds & drives OpenHarness's `QueryEngine` and
   forwards its `StreamEvent`s:
   - `runner.py` — `build_query_engine()` (Ollama-backed, no tools, OH's
