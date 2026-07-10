@@ -1,4 +1,4 @@
-import type { JobInfo } from "../shared/types";
+import type { ApplyQuestion, JobInfo } from "../shared/types";
 import { SELECTORS, jobIdFromHref } from "./selectors";
 
 // Reads a JobInfo out of the open slide-in modal. Pure DOM -> data; no side
@@ -134,6 +134,55 @@ function readJobId(modal: HTMLElement, title: string): { jobId: string | null; j
   };
 }
 
+/**
+ * Wellfound nests each question's field inside its <label> (the label's `for`
+ * attribute is broken — "form-input--undefined"), so the question text is the
+ * label's text minus the field's own content.
+ */
+function readQuestionLabel(field: Element): string | null {
+  const label = field.closest("label");
+  if (label) {
+    const copy = label.cloneNode(true) as HTMLElement;
+    for (const el of Array.from(copy.querySelectorAll("textarea, input, select"))) el.remove();
+    const text = clean(copy.textContent);
+    if (text) return text;
+  }
+  const hint = field.getAttribute("placeholder") || field.getAttribute("aria-label");
+  return hint ? clean(hint) : null;
+}
+
+/**
+ * The Apply form's questions: every textarea/input named
+ * customQuestionAnswers[<id>][answer], deduped by id — the form can render
+ * twice (desktop panel + mobile sheet), and choice questions repeat the name
+ * per option. Only text fields are fully supported for now.
+ */
+function readQuestions(modal: HTMLElement): ApplyQuestion[] {
+  const questions: ApplyQuestion[] = [];
+  const seen = new Set<string>();
+
+  for (const field of Array.from(
+    modal.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(SELECTORS.questionFields),
+  )) {
+    if (field instanceof HTMLInputElement && field.type === "hidden") continue;
+
+    const fieldName = field.getAttribute("name") ?? "";
+    const id = fieldName.match(/customQuestionAnswers\[(\d+)\]/)?.[1];
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+
+    questions.push({
+      id,
+      question: readQuestionLabel(field) ?? `Question ${id}`,
+      kind: field.tagName === "TEXTAREA" ? "textarea" : "input",
+      fieldName,
+      currentValue: field.value ?? "",
+    });
+  }
+
+  return questions;
+}
+
 export function extractJob(modal: HTMLElement): JobInfo {
   const titleEl = modal.querySelector(SELECTORS.title);
   const title = clean(titleEl?.textContent);
@@ -162,6 +211,9 @@ export function extractJob(modal: HTMLElement): JobInfo {
   const { fields, skills } = readFields(modal);
   const { jobId, jobUrl } = readJobId(modal, title);
 
+  const questions = readQuestions(modal);
+  const hasApplyForm = questions.length > 0 || Boolean(modal.querySelector(SELECTORS.submit));
+
   return {
     jobId,
     jobUrl,
@@ -177,6 +229,8 @@ export function extractJob(modal: HTMLElement): JobInfo {
     skills,
     description,
     emails,
+    hasApplyForm,
+    questions,
     capturedAt: Date.now(),
   };
 }

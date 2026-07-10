@@ -44,5 +44,8 @@ wellfound.com DOM ──content script──► chrome.runtime message
 Storage (not direct messaging) is the bus so the panel shows the job even when
 it's opened *after* the job was captured.
 
-> Steps 1–2 done: the panel shows the job you're viewing (title, company, salary,
-> remote policy & friends, skills, description). Next: the Apply questions.
+> Steps 1–3 done: the panel shows the job you're viewing (title, company, salary,
+> remote policy & friends, skills, description) and the Apply form's written
+> questions — each `customQuestionAnswers[<id>][answer]` field paired with its
+> label text (read by walking up from the field: Wellfound's label `for`
+> attributes are broken). Next: wiring up OpenHarness to draft the answers.

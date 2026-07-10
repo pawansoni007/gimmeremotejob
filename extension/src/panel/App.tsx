@@ -1,4 +1,5 @@
 import { JobCard } from "./JobCard";
+import { QuestionsCard } from "./QuestionsCard";
 import { useCurrentJob } from "./useCurrentJob";
 
 export function App() {
@@ -11,7 +12,10 @@ export function App() {
       </header>
 
       {job ? (
-        <JobCard job={job} />
+        <>
+          <QuestionsCard job={job} />
+          <JobCard job={job} />
+        </>
       ) : (
         <div className="empty-state">
           <p>No job in view.</p>

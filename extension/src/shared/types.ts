@@ -1,5 +1,17 @@
 // Shared shapes passed between content script -> background -> side panel.
 
+export interface ApplyQuestion {
+  /** The numeric id inside customQuestionAnswers[<id>][answer]. */
+  id: string;
+  question: string;
+  /** textarea = long answer, input = short answer. */
+  kind: "textarea" | "input";
+  /** The field's name attribute — how we find its box again (future autofill). */
+  fieldName: string;
+  /** Whatever is already typed in the box when we read it. */
+  currentValue: string;
+}
+
 export interface JobInfo {
   /** Numeric Wellfound job id, e.g. "4230970". Null if we couldn't find one. */
   jobId: string | null;
@@ -36,6 +48,13 @@ export interface JobInfo {
   description: string;
   /** mailto: addresses found in the description — for the future email feature. */
   emails: string[];
+  /** True when the in-modal Wellfound apply form is present (vs. external apply). */
+  hasApplyForm: boolean;
+  /**
+   * The Apply form's written questions, in form order. Empty when the form has
+   * no custom questions or isn't present at all (see hasApplyForm).
+   */
+  questions: ApplyQuestion[];
   /** When we read it (ms epoch). */
   capturedAt: number;
 }

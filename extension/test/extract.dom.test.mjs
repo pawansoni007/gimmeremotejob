@@ -69,6 +69,36 @@ try {
   assert.ok(job.description.length > 5000, "description looks truncated");
   assert.deepEqual(job.emails, ["talent@bullwhip.io"]);
 
+  // --- Step 3: the Apply form's questions ---
+  assert.equal(job.hasApplyForm, true);
+  assert.deepEqual(job.questions, [
+    {
+      id: "263701",
+      question: "What interests you about working for this company?",
+      kind: "textarea",
+      fieldName: "customQuestionAnswers[263701][answer]",
+      currentValue: "",
+    },
+  ]);
+
+  // Text the user already typed must come back in currentValue.
+  const typed = await page.evaluate(() => {
+    document.querySelector('[name^="customQuestionAnswers"]').value = "I love analytics.";
+    const modal = document.querySelector('[data-test="DiscoverModal"]');
+    return window.WF.extractJob(modal).questions[0].currentValue;
+  });
+  assert.equal(typed, "I love analytics.");
+
+  // With the form gone (external-application jobs), we must say so.
+  const noForm = await page.evaluate(() => {
+    document.querySelector("form").remove();
+    const modal = document.querySelector('[data-test="DiscoverModal"]');
+    const job = window.WF.extractJob(modal);
+    return { hasApplyForm: job.hasApplyForm, questions: job.questions };
+  });
+  assert.equal(noForm.hasApplyForm, false);
+  assert.deepEqual(noForm.questions, []);
+
   console.log("extract.dom.test: all assertions passed");
 } finally {
   await browser.close();
