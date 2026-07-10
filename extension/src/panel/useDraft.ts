@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SseDecoder, splitAnswers } from "../shared/answers";
-import { SERVICE_URL } from "../shared/config";
+import { splitAnswers } from "../shared/answers";
 import type { JobInfo } from "../shared/types";
+import { describeFetchError, streamSse } from "./api";
 
 // Drives one drafting run against the service: POST the job, stream the SSE
 // events, expose live text while it streams and per-question answers when done.
-// (EventSource can't POST, so this parses the stream off fetch() by hand.)
+// (EventSource can't POST, so api.streamSse parses the stream off fetch().)
 
 export type DraftStatus = "idle" | "streaming" | "done" | "error";
 
@@ -16,9 +16,17 @@ export interface DraftState {
   /** One entry per question once done; null before that. */
   answers: string[] | null;
   error: string | null;
+  /** Set when the run was persisted — the id to find it under History. */
+  conversationId: string | null;
 }
 
-const IDLE: DraftState = { status: "idle", liveText: "", answers: null, error: null };
+const IDLE: DraftState = {
+  status: "idle",
+  liveText: "",
+  answers: null,
+  error: null,
+  conversationId: null,
+};
 
 export function useDraft(job: JobInfo | null): {
   state: DraftState;
@@ -48,42 +56,32 @@ export function useDraft(job: JobInfo | null): {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-    setState({ status: "streaming", liveText: "", answers: null, error: null });
+    setState({ ...IDLE, status: "streaming" });
 
     let live = "";
     let finalText = "";
     let errorMessage: string | null = null;
+    let conversationId: string | null = null;
 
     try {
-      const response = await fetch(`${SERVICE_URL}/apply/stream`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(currentJob),
-        signal: controller.signal,
-      });
-      if (!response.ok || !response.body) {
-        throw new Error(`service responded ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const textDecoder = new TextDecoder();
-      const sse = new SseDecoder();
-
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        for (const event of sse.push(textDecoder.decode(value, { stream: true }))) {
+      await streamSse(
+        "/apply/stream",
+        currentJob,
+        (event) => {
           if (event.type === "text_delta" && event.text) {
             live += event.text;
             const liveText = live;
             setState((s) => ({ ...s, liveText }));
           } else if (event.type === "turn_complete" && typeof event.text === "string") {
             finalText = event.text;
+          } else if (event.type === "saved") {
+            conversationId = event.conversation_id ?? null;
           } else if (event.type === "error" && !finalText) {
             errorMessage = event.message ?? "unknown error";
           }
-        }
-      }
+        },
+        controller.signal,
+      );
 
       if (finalText) {
         setState({
@@ -91,12 +89,13 @@ export function useDraft(job: JobInfo | null): {
           liveText: finalText,
           answers: splitAnswers(finalText, currentJob.questions.length),
           error: null,
+          conversationId,
         });
       } else {
         setState({
+          ...IDLE,
           status: "error",
           liveText: live,
-          answers: null,
           error: errorMessage ?? "The stream ended without a draft.",
         });
       }
@@ -105,12 +104,7 @@ export function useDraft(job: JobInfo | null): {
         setState(IDLE);
         return;
       }
-      // fetch() rejects with TypeError when nothing is listening.
-      const message =
-        err instanceof TypeError
-          ? `Can't reach the service at ${SERVICE_URL}. Start it with: cd service && uv run uvicorn app.main:app --port 8756`
-          : String(err);
-      setState({ status: "error", liveText: live, answers: null, error: message });
+      setState({ ...IDLE, status: "error", liveText: live, error: describeFetchError(err) });
     }
   }, []);
 

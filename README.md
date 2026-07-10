@@ -21,14 +21,19 @@ Plus `docker-compose.yml` for Postgres.
 
 ## Status
 
-Built in small steps. **Steps 1–5 are in place** — the core loop works end to
-end: open a Wellfound job, the side panel shows the Apply questions and the job
-the extension read; hit **Draft answers** and the service drives OpenHarness's
-`QueryEngine` (in-process, against your local Ollama) and streams the draft
-live into the panel, one answer per question, each with a **Copy** button.
-To run it: `docker compose up -d` (not needed until Step 6),
-`cd service && uv run uvicorn app.main:app --port 8756`, extension loaded
-unpacked, Ollama running. See each folder's README for details.
+Built in small steps. **Steps 1–6 are in place** — the loop works end to end
+and is remembered: open a Wellfound job, the side panel shows the Apply
+questions; **Draft answers** streams the draft live from OpenHarness's
+`QueryEngine` (in-process, against your local Ollama), one answer per question
+with a **Copy** button; every run is saved to Postgres (job + full conversation
++ answers). **History** in the panel lists past drafts; open one and continue
+the conversation — the model sees its earlier draft and revises it ("make
+answer 1 shorter"). If Postgres is down, drafting still works; only the save
+is skipped.
+
+To run it: `docker compose up -d`, `cd service && uv run uvicorn app.main:app
+--port 8756`, extension loaded unpacked, Ollama running. See each folder's
+README for details.
 
 ## Toolchain (locked)
 
@@ -49,5 +54,5 @@ available (signed in for the cloud model), Chrome (load the extension unpacked).
 3. ✅ Extension grabs the Apply questions
 4. ✅ Wire up OpenHarness in-process (Ollama-backed)
 5. ✅ FastAPI + SSE streaming into the panel
-6. Postgres memory (save + resume conversations)
+6. ✅ Postgres memory (save + resume conversations)
 7. Polish

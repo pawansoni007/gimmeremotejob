@@ -9,6 +9,8 @@ export interface StreamEventData {
   message?: string;
   recoverable?: boolean;
   usage?: { input_tokens: number; output_tokens: number };
+  /** On {"type": "saved"} — the persisted conversation's id. */
+  conversation_id?: string;
 }
 
 /**

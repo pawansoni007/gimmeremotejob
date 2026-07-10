@@ -45,9 +45,12 @@ wellfound.com DOM ──content script──► chrome.runtime message
 Storage (not direct messaging) is the bus so the panel shows the job even when
 it's opened *after* the job was captured.
 
-> Steps 1–5 done: the panel shows the job and its Apply questions, and **Draft
+> Steps 1–6 done: the panel shows the job and its Apply questions; **Draft
 > answers** streams the model's draft live from the local service
-> (`POST /apply/stream`, SSE over fetch — EventSource can't POST), then splits
-> it into per-question answers with Copy buttons. The service must be running
+> (`POST /apply/stream`, SSE over fetch — EventSource can't POST) and splits it
+> into per-question answers with Copy buttons. Saved runs appear under
+> **History** (top right): open one to re-copy its answers or continue the
+> conversation — follow-ups resume the same model conversation and updated
+> answers are re-saved. The service must be running
 > (`cd service && uv run uvicorn app.main:app --port 8756`); the panel says so
 > if it isn't.

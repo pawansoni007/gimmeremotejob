@@ -4,7 +4,14 @@ import { useDraft } from "./useDraft";
 
 // The Apply form's written questions, and the drafting flow: hit "Draft
 // answers", watch the agent stream, then copy each answer into the real form.
-export function QuestionsCard({ job }: { job: JobInfo }) {
+// Saved runs land in History; onSaved jumps straight to the conversation.
+export function QuestionsCard({
+  job,
+  onSaved,
+}: {
+  job: JobInfo;
+  onSaved?: (conversationId: string) => void;
+}) {
   const { state, start, stop } = useDraft(job);
 
   if (!job.hasApplyForm) {
@@ -111,6 +118,18 @@ export function QuestionsCard({ job }: { job: JobInfo }) {
       {state.status === "idle" && (
         <p className="card-note">
           Drafts stream from your local model — review, tweak, then copy into the form.
+        </p>
+      )}
+
+      {state.status === "done" && state.conversationId && (
+        <p className="card-note">
+          Saved ✓{" "}
+          <button
+            className="link-button"
+            onClick={() => onSaved?.(state.conversationId!)}
+          >
+            Continue this conversation
+          </button>
         </p>
       )}
     </section>

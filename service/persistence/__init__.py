@@ -1,6 +1,26 @@
-"""Conversations / jobs / answers <-> Postgres.
+"""Postgres persistence: jobs, conversations (resumable), drafted answers."""
 
-Wired up in Step 6. Tables (rough): conversations(id, job_id, summary, model,
-messages jsonb, timestamps), jobs(wellfound_id, title, company, description, url),
-applications(job_id, questions, answers, status, dates).
-"""
+from .db import configure, create_tables, dispose, session_factory
+from .models import Application, Conversation, Job
+from .repository import (
+    get_conversation,
+    list_conversations,
+    record_draft_run,
+    update_after_resume,
+    upsert_job,
+)
+
+__all__ = [
+    "Application",
+    "Conversation",
+    "Job",
+    "configure",
+    "create_tables",
+    "dispose",
+    "get_conversation",
+    "list_conversations",
+    "record_draft_run",
+    "session_factory",
+    "update_after_resume",
+    "upsert_job",
+]
